@@ -15,11 +15,11 @@
 void	eat(t_phil *philosopher)
 {
 	pthread_mutex_lock(philosopher->right_fork);
-	printf("%ld %i has taken a fork\n", ft_timestamp(), philosopher->index);
+	ft_write(philosopher, ft_timestamp(), "has taken a fork");
 	pthread_mutex_lock(philosopher->left_fork);
-	printf("%ld %i has taken a fork\n", ft_timestamp(), philosopher->index);
+	ft_write(philosopher, ft_timestamp(), "has taken a fork");
 	philosopher->eating = 1;
-	printf("%ld %i is eating\n", ft_timestamp(), philosopher->index);
+	ft_write(philosopher, ft_timestamp(), "is eating");
 	ft_usleep(philosopher->time_to_eat);
 	philosopher->eating = 0;
 	philosopher->nb_of_meals += 1;
@@ -30,7 +30,7 @@ void	eat(t_phil *philosopher)
 
 void	fsleep(t_phil *philosopher)
 {
-	printf("%ld %i is sleeping\n", ft_timestamp(), philosopher->index);
+	ft_write(philosopher, ft_timestamp(), "is sleeping");
 	ft_usleep(philosopher->time_to_sleep);
 }
 
@@ -43,9 +43,12 @@ void	*routine(void *n)
 		usleep(100);
 	while (self->alive)
 	{
-		eat(self);
-		fsleep(self);
-		printf("%ld %i is thinking\n", ft_timestamp(), self->index);
+		if (self->alive)
+			eat(self);
+		if (self->alive)
+			fsleep(self);
+		if (self->alive)
+			ft_write(self, ft_timestamp(), "is thinking");
 		if (self->max_meals && self->nb_of_meals >= self->max_meals)
 			break ;
 	}
@@ -62,8 +65,7 @@ void	*monitor_routine(void *n)
 	while (!(s->has_died))
 	{
 		i = 0;
-		if (check_all_done(s->table))
-			s->has_died = 1;
+		s->has_died = check_all_done(s->table);
 		while (i < s->nb_philo)
 		{
 			if (s->table[i]->time_to_die + s->table[i]->last_meal
@@ -77,6 +79,8 @@ void	*monitor_routine(void *n)
 			i++;
 		}
 	}
+	pthread_mutex_lock(s->writing);
 	stop_threads(s);
+	pthread_mutex_unlock(s->writing);
 	return (NULL);
 }

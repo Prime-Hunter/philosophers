@@ -34,15 +34,17 @@ typedef struct s_phil
 	pthread_t				id;
 	pthread_mutex_t			*right_fork;
 	pthread_mutex_t			*left_fork;
+	pthread_mutex_t			*writing;
 }				t_phil;
 
 typedef struct s_monitor
 {
-	int			start;
-	int			nb_philo;
-	int			has_died;
-	t_phil		**table;
-	pthread_t	id;
+	int				start;
+	int				nb_philo;
+	int				has_died;
+	t_phil			**table;
+	pthread_t		id;
+	pthread_mutex_t	*writing;
 }				t_monitor;
 
 int					ft_check_args(int argc, char **args);
@@ -53,12 +55,13 @@ int					launch_threads(t_monitor *monitor);
 int					ft_interrupt(t_monitor *monitor, char *msg);
 void				stop_threads(t_monitor *monitor);
 void				ft_free(t_phil **table);
+void 				ft_write(t_phil *philo, size_t time, char *msg);
 void				eat(t_phil *philosopher);
 void				fsleep(t_phil *philosopher);
 void				*routine(void *n);
 void				*monitor_routine(void *n);
 size_t				ft_timestamp(void);
-t_phil				**init_table(int number, char **args);
+t_phil				**init_table(t_monitor *m, char **ar);
 t_monitor			*init_monitor(char **args);
 
 #endif

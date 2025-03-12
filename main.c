@@ -20,11 +20,13 @@ int	main(int argc, char **args)
 	if (!ft_check_args(argc, args))
 		return (0);
 	monitor = init_monitor(args);
-	table = init_table(monitor->nb_philo, args);
+	table = init_table(monitor, args);
 	monitor->table = table;
 	if (!launch_threads(monitor))
 		return (0);
 	ft_free(table);
+	pthread_mutex_destroy(monitor->writing);
+	free(monitor->writing);
 	free(monitor);
 	return (1);
 }

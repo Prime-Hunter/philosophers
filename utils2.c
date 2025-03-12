@@ -29,3 +29,11 @@ int	ft_usleep(size_t milliseconds)
 		usleep(500);
 	return (0);
 }
+
+void ft_write(t_phil *philo, size_t time, char *msg)
+{
+	pthread_mutex_lock(philo->writing);
+	if (philo->alive)
+		printf("%ld %i %s\n", time, philo->index, msg);
+	pthread_mutex_unlock(philo->writing);
+}
